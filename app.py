@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import os
 
 # User credentials
 USER_EMAIL = "user@wscom.edu"
@@ -81,7 +82,7 @@ st.markdown(
 st.markdown("<div class='title-container'>📊 Wharton Street College of Medicine Dashboard</div>", unsafe_allow_html=True)
 
 # Load Data
-file_path = "/Users/venkkandadai/Documents/Streamlit Project Folder/Synthetic Dashboard Data.xlsx"
+file_path = os.path.join(os.getcwd(), "Synthetic Dashboard Data.xlsx")
 xls = pd.ExcelFile(file_path)
 students_df = pd.read_excel(xls, sheet_name="students")
 national_comparison_df = pd.read_excel(xls, sheet_name="national_comparison")
