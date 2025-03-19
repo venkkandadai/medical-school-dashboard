@@ -329,8 +329,22 @@ if page == "USMLE Step 1 Trends":
             filtered_df, x="test_date", y="Score", color="test_id",
             markers=True, title="USMLE Step 1 Preparation Score Trends"
         )
-        fig.update_layout(xaxis_title="Exam Date", yaxis_title="Score", legend_title="Exam Type")
-        st.plotly_chart(fig)
+        
+        # Increase marker size
+        fig.update_traces(marker=dict(size=18))
+        
+        # Adjust figure size and layout
+        fig.update_layout(
+            xaxis_title="Exam Date",
+            yaxis_title="Score",
+            legend_title="Exam Type",
+            width=1000,  # Increase width
+            height=600,  # Increase height
+            margin=dict(l=50, r=50, t=50, b=50),  # Reduce margins to maximize space
+        )
+
+        st.plotly_chart(fig, use_container_width=True)  # Expands to available space in Streamlit
+
     else:
         st.warning("No data available for the selected filters.")
 
@@ -378,8 +392,21 @@ if page == "USMLE Step 2 CK Trends":
             filtered_df, x="test_date", y="Score", color="test_id",
             markers=True, title="USMLE Step 2 CK Preparation Score Trends"
         )
-        fig.update_layout(xaxis_title="Exam Date", yaxis_title="Score", legend_title="Exam Type")
-        st.plotly_chart(fig)
+        
+        # Increase marker size
+        fig.update_traces(marker=dict(size=18)) 
+
+        #Adjust figure size and layout
+        fig.update_layout(
+            xaxis_title="Exam Date",
+            yaxis_title="Score",
+            legend_title="Exam Type",
+            width=1000,
+            height=600,
+            margin=dict(l=50,r=50,t=50,b=50),
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
     else:
         st.warning("No data available for the selected filters.")
 
