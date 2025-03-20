@@ -149,9 +149,9 @@ for key, value in filter_defaults.items():
         st.session_state[key] = value
 
 
-# Sidebar Navigation
+# Sidebar Navigation ("Student Roster is hidden")
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Select a Page", ["Critical KPIs","Student Roster", "Exam Scores", "Aggregate Exam Statistics", "USMLE Step 1 Trends", "USMLE Step 2 CK Trends"])
+page = st.sidebar.radio("Select a Page", ["Critical KPIs", "Student Exam Scores", "Aggregate Exam Statistics", "USMLE Step 1 Trends", "USMLE Step 2 CK Trends"])
 
 def reset_filters():
     for key, value in filter_defaults.items():
@@ -231,7 +231,7 @@ if page == "Student Roster":
     st.subheader("📜 School Roster")
     st.dataframe(filtered_df[["student_id", "first_name", "last_name", "year", "campus"]])
 
-elif page == "Exam Scores":
+elif page == "Student Exam Scores":
     st.sidebar.title("Filters")
     if st.sidebar.button("Reset Filters"):
         reset_filters()
@@ -279,8 +279,13 @@ elif page == "Exam Scores":
             (filtered_df["test_date"] <= pd.to_datetime(end_date))
         ]
 
-    st.subheader("📝 Exam Scores")
-    st.dataframe(filtered_df[["student_id", "first_name", "last_name", "year", "test_id", "exam_name", "Score", "Result", "test_date"]])
+    st.subheader("📝 Student Exam Scores")
+
+    # ✅ Updated: Added "campus" column to the displayed DataFrame
+    st.dataframe(filtered_df[[
+        "student_id", "first_name", "last_name", "year", "campus",  # <- Added "campus"
+        "test_id", "exam_name", "Score", "Result", "test_date"
+    ]])
 
 
 if page == "USMLE Step 1 Trends":
