@@ -328,28 +328,41 @@ if page == "USMLE Step 1 Trends":
     # Remove USMLE1 from the score trends plot since it doesn't have numeric scores
     filtered_df = filtered_df[filtered_df["test_id"] != "USMLE1"]
     
-    # Plot score trends over time
+    # Plot score trends over time with custom colors
     if not filtered_df.empty:
         fig = px.line(
             filtered_df, x="test_date", y="Score", color="test_id",
             markers=True, title="USMLE Step 1 Preparation Score Trends"
         )
-        
-        # Increase marker size
-        fig.update_traces(marker=dict(size=18))
-        
+
+        # Define custom colors for CBSSA1 & CBSSA2 (blue), CBSE1 & CBSE2 (red)
+        color_map = {
+            "CBSSA1": "blue",
+            "CBSSA2": "blue",
+            "CBSE1": "red",
+            "CBSE2": "red"
+        }
+
+        # Update traces with custom colors
+        for trace in fig.data:
+            test_id = trace.name  # Extract test_id (legend name)
+            if test_id in color_map:
+                trace.marker.color = color_map[test_id]
+
+        # Increase marker size for better visibility
+        fig.update_traces(marker=dict(size=12))
+
         # Adjust figure size and layout
         fig.update_layout(
             xaxis_title="Exam Date",
             yaxis_title="Score",
             legend_title="Exam Type",
-            width=1000,  # Increase width
-            height=600,  # Increase height
-            margin=dict(l=50, r=50, t=50, b=50),  # Reduce margins to maximize space
+            width=1000,
+            height=600,
+            margin=dict(l=50, r=50, t=50, b=50),
         )
 
         st.plotly_chart(fig, use_container_width=True)  # Expands to available space in Streamlit
-
     else:
         st.warning("No data available for the selected filters.")
 
@@ -364,8 +377,8 @@ if page == "USMLE Step 2 CK Trends":
     selected_name = st.sidebar.selectbox("Select Student Name", ["All"] + student_names_sorted, key="selected_name")
     selected_id = st.sidebar.selectbox("Select Student ID", ["All"] + sorted(exam_scores_df["student_id"].unique()), key="selected_id_trends_2ck")
     
-    # Filter dataset for USMLE Step 2 CK-related tests
-    usmle_tests_2ck = ["CCSSA", "CCSSE", "USMLE2CK"]
+    # ✅ Ensure CCSE is included
+    usmle_tests_2ck = ["CCSSA", "CCSE", "CCSE", "USMLE2CK"]
     filtered_df = exam_scores_df[exam_scores_df["test_id"].isin(usmle_tests_2ck)].copy()
     
     # Apply Filters
@@ -373,8 +386,11 @@ if page == "USMLE Step 2 CK Trends":
         filtered_df = filtered_df[filtered_df["full_name"] == selected_name]
     if selected_id != "All":
         filtered_df = filtered_df[filtered_df["student_id"] == int(selected_id)]
-    
-    # Display selected student's name and ID regardless of filter choice
+
+    # Debugging: Check if CCSSA, CCSE, and USMLE2CK appear
+    st.write("Filtered Test IDs:", filtered_df["test_id"].unique())
+
+    # Display selected student's name and ID
     if not filtered_df.empty:
         student_info = filtered_df.iloc[0]
         st.markdown(f"### Selected Student: {student_info['full_name']} (ID: {student_info['student_id']})")
@@ -397,18 +413,31 @@ if page == "USMLE Step 2 CK Trends":
             filtered_df, x="test_date", y="Score", color="test_id",
             markers=True, title="USMLE Step 2 CK Preparation Score Trends"
         )
-        
-        # Increase marker size
-        fig.update_traces(marker=dict(size=18)) 
 
-        #Adjust figure size and layout
+        # ✅ Define custom colors
+        color_map = {
+            "CCSSA": "blue",   # 🔵 CCSSA
+            "CCSE": "red",      # 🔴 CCSE
+            "USMLE2CK": "green" # 🟢 USMLE2CK
+        }
+
+        # ✅ Apply custom colors
+        for trace in fig.data:
+            test_id = trace.name  # Extract test_id (legend name)
+            if test_id in color_map:
+                trace.marker.color = color_map[test_id]
+
+        # Increase marker size for better visibility
+        fig.update_traces(marker=dict(size=12))  
+
+        # Adjust figure size and layout
         fig.update_layout(
             xaxis_title="Exam Date",
             yaxis_title="Score",
             legend_title="Exam Type",
             width=1000,
             height=600,
-            margin=dict(l=50,r=50,t=50,b=50),
+            margin=dict(l=50, r=50, t=50, b=50),
         )
 
         st.plotly_chart(fig, use_container_width=True)
