@@ -168,46 +168,56 @@ def reset_filters():
 if page == "Critical KPIs":
     st.subheader("📊 Critical KPIs")
     
-    # Display Key Subject Exams in a styled box
-    st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
-    st.markdown("**Key Subject Exams**")
-    
-    exams_of_interest = ["CBSE1", "CBSE2", "CCSSE"]
+    # ----- Key Subject Exams -----
+    st.markdown("### 🧠 Key Comprehensive Subject Exams")
+    exams_of_interest = ["CBSE1", "CBSE2", "CCSE"]
     exam_averages = exam_scores_df[exam_scores_df["test_id"].isin(exams_of_interest)].groupby("test_id").agg(
         avg_score=("Score", "mean"),
         num_students=("Score", "count")
     ).reset_index()
-    
-    for index, row in exam_averages.iterrows():
-        st.markdown(f"**{row['test_id']}**")
-        st.metric(label=f"Average Score", value=f"{round(row['avg_score'], 2)}")
-        st.markdown(f"Students: {row['num_students']}")
-        st.markdown("---")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Display USMLE Results in a styled box
-    st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
-    st.markdown("**USMLE Results**")
-    
-    # Compute Pass Rate for USMLE1
-    usmle1_data = exam_scores_df[exam_scores_df["test_id"] == "USMLE1"]
-    usmle1_pass_rate = (usmle1_data["pass"].mean() * 100) if not usmle1_data.empty else 0
-    usmle1_students = usmle1_data.shape[0]
-    
-    st.metric(label="USMLE1 Pass Rate", value=f"{round(usmle1_pass_rate, 2)}%")
-    st.markdown(f"Students: {usmle1_students}")
-    st.markdown("---")
-    
-    # Compute Average Score for USMLE2CK
-    usmle2ck_data = exam_scores_df[exam_scores_df["test_id"] == "USMLE2CK"]
-    usmle2ck_avg_score = usmle2ck_data["Score"].mean() if not usmle2ck_data.empty else 0
-    usmle2ck_students = usmle2ck_data.shape[0]
-    
-    st.metric(label="USMLE2CK Average Score", value=f"{round(usmle2ck_avg_score, 2)}")
-    st.markdown(f"Students: {usmle2ck_students}")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+
+    cols = st.columns(len(exam_averages))
+    for idx, row in exam_averages.iterrows():
+        with cols[idx]:
+            st.metric(label=f"{row['test_id']} Average", value=f"{round(row['avg_score'], 1)}")
+            st.caption(f"👨‍🎓 {row['num_students']} students")
+
+    # Optional: Bar chart for visual comparison
+    fig = px.bar(
+        exam_averages,
+        x="test_id",
+        y="avg_score",
+        text="avg_score",
+        title="Average Scores by Subject Exam"
+    )
+    fig.update_traces(texttemplate='%{text:.1f}', textposition='outside')
+    fig.update_layout(
+        yaxis_title="Average Score",
+        xaxis_title="Exam",
+        height=300,
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # ----- USMLE Results -----
+    st.markdown("### 🏥 USMLE Exams")
+    col1, col2 = st.columns(2)
+
+    # USMLE Step 1 Pass Rate
+    with col1:
+        usmle1_data = exam_scores_df[exam_scores_df["test_id"] == "USMLE1"]
+        usmle1_pass_rate = (usmle1_data["pass"].mean() * 100) if not usmle1_data.empty else 0
+        usmle1_students = usmle1_data.shape[0]
+        st.metric(label="USMLE Step 1 Pass Rate", value=f"{round(usmle1_pass_rate, 1)}%")
+        st.caption(f"🧑‍⚕️ {usmle1_students} students")
+
+    # USMLE Step 2 CK Average Score
+    with col2:
+        usmle2ck_data = exam_scores_df[exam_scores_df["test_id"] == "USMLE2CK"]
+        usmle2ck_avg_score = usmle2ck_data["Score"].mean() if not usmle2ck_data.empty else 0
+        usmle2ck_students = usmle2ck_data.shape[0]
+        st.metric(label="USMLE Step 2 CK Avg Score", value=f"{round(usmle2ck_avg_score, 1)}")
+        st.caption(f"👩‍⚕️ {usmle2ck_students} students")
 
 if page == "Student Roster":
     st.sidebar.title("Filters")
